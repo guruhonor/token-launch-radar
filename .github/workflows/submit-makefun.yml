@@ -1,0 +1,51 @@
+name: Submit make.fun entry
+
+# Submits the token-launch-radar entry to the make.fun bounty
+# "Build the best token launch radar" (token-radar-01).
+# Runs the official make.fun CLI on a GitHub runner, where outbound
+# POSTs work. Trigger manually, exactly once, from the Actions tab.
+# Requires the repository secret MAKEFUN_KEYPAIR (the Solana wallet
+# keypair file contents, a 64-number JSON array, mode 600 equivalent).
+
+on:
+  workflow_dispatch:
+
+concurrency:
+  group: submit-makefun-entry
+  cancel-in-progress: false
+
+jobs:
+  submit:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js 22
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: Download make.fun kit
+        run: |
+          curl -sSL -o kit.tar.gz "https://make.fun/c/token-radar-01/kit"
+          tar xzf kit.tar.gz
+          test -f token-radar-01-kit/cli/makefun.mjs
+
+      - name: Download transcript bundle
+        run: |
+          curl -sSL -o transcripts.tar.gz "https://muse.ai/files/1303530976184167/1135749625830208/93wx88uudlpheemr2yf9h1nt/transcripts.tar.gz"
+          echo "a7cc4457b081d5376de981d732ffbe39a586290ccee7f3bb70f4d32aa147cb6a  transcripts.tar.gz" | sha256sum -c -
+          ls -la transcripts.tar.gz
+
+      - name: Write keypair from secret
+        run: |
+          printf '%s' '${{ secrets.MAKEFUN_KEYPAIR }}' > wallet.json
+          chmod 600 wallet.json
+          node -e "const w=require('./wallet.json'); if(!Array.isArray(w)||w.length!==64) throw new Error('bad keypair'); console.log('keypair ok: 64 numbers')"
+
+      - name: Register wallet (mint API key)
+        run: node token-radar-01-kit/cli/makefun.mjs register --keypair wallet.json
+
+      - name: Submit entry
+        run: node token-radar-01-kit/cli/makefun.mjs submit --competition token-radar-01 --repo-url https://github.com/guruhonor/token-launch-radar --commit ${{ github.sha }} --bundle transcripts.tar.gz --keypair wallet.json --title "Token Launch Radar"
