@@ -1,0 +1,106 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Token Radar — pre-token protocols, ranked by implied value</title>
+<link rel="stylesheet" href="app.css">
+<script src="../data.js" defer></script>
+<script src="app.js" defer></script>
+</head>
+<body>
+<a class="skip" href="#board">Skip to board</a>
+<div class="shell">
+  <header class="top">
+    <div class="brand"><span class="mark" aria-hidden="true"></span><span class="brand-name">TOKEN RADAR</span></div>
+    <div class="top-meta">
+      <span>Snapshot <span id="meta-asof">—</span></span>
+      <span>DefiLlama protocol index</span>
+      <span>Model radar-2</span>
+    </div>
+  </header>
+
+  <section class="lede" aria-labelledby="lede-title">
+    <div>
+      <h1 id="lede-title">Pre-token protocols, ranked by implied value</h1>
+      <p id="lede-text">The watchlist is the floor: every protocol with at least $50M of TVL and no token on record. The early radar adds every other pre-token protocol the same rule leaves in, however small. Implied value is a model, not a promise — it prices what a token might be worth if it launched at a multiple of the value the protocol already secures.</p>
+    </div>
+    <dl class="facts" id="facts">
+      <div class="fact"><dt>Watchlist covered</dt><dd><b id="fact-watchlist">—</b></dd></div>
+      <div class="fact"><dt>Pre-token rows scored</dt><dd><b id="fact-rows">—</b></dd></div>
+      <div class="fact"><dt>Early rows below the floor</dt><dd><b id="fact-early">—</b></dd></div>
+      <div class="fact"><dt>Set aside, with reasons</dt><dd><b id="fact-setaside">—</b></dd></div>
+    </dl>
+  </section>
+
+  <div class="controls">
+    <div class="field">
+      <label for="q">Search</label>
+      <input id="q" type="search" placeholder="Search name, category or chain" autocomplete="off">
+    </div>
+    <div class="field">
+      <label for="category">Category</label>
+      <select id="category"><option value="">All categories</option></select>
+    </div>
+    <div class="field">
+      <label for="chain">Chain</label>
+      <select id="chain"><option value="">All chains</option></select>
+    </div>
+    <div class="tabs" role="group" aria-label="Token status">
+      <button type="button" id="tab-pre" aria-pressed="true">Pre-token</button>
+      <button type="button" id="tab-live" aria-pressed="false">Live token</button>
+      <button type="button" id="tab-setaside" aria-pressed="false">Set aside</button>
+    </div>
+    <span class="count" id="count" aria-live="polite"></span>
+  </div>
+
+  <section class="panel" id="board" aria-label="Protocol board">
+    <p class="panel-note" id="panel-note"></p>
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th><button type="button" data-sort="rank">Rank <span class="arrow" aria-hidden="true"></span></button></th>
+            <th><button type="button" data-sort="name">Protocol <span class="arrow" aria-hidden="true"></span></button></th>
+            <th><button type="button" data-sort="tvl">TVL <span class="arrow" aria-hidden="true"></span></button></th>
+            <th><button type="button" data-sort="change">7d <span class="arrow" aria-hidden="true"></span></button></th>
+            <th><button type="button" data-sort="age">Age <span class="arrow" aria-hidden="true"></span></button></th>
+            <th><button type="button" data-sort="value" id="value-header">Implied value <span class="arrow" aria-hidden="true"></span></button></th>
+            <th><button type="button" data-sort="token">Token <span class="arrow" aria-hidden="true"></span></button></th>
+          </tr>
+        </thead>
+        <tbody id="rows"></tbody>
+      </table>
+    </div>
+    <div class="empty" id="empty" hidden>
+      <h2>No protocols match</h2>
+      <p>Loosen the search or clear a filter to see the board again.</p>
+      <button class="button primary" id="clear-filters" type="button">Clear search and filters</button>
+    </div>
+  </section>
+
+  <section class="model panel" aria-labelledby="model-title">
+    <h2 id="model-title">How the value is built</h2>
+    <p class="model-text">Implied value = TVL × sector multiple × growth multiplier × maturity multiplier. The sector multiple follows the protocol's role: 0.50 for exchange-like protocols (DEXs, lending, CDPs, derivatives, perpetuals) whose token would capture ongoing fees; 0.40 for allocators (vaults, curators, yield aggregators); 0.30 for asset and utility protocols (RWA, wrappers, payments, chains) and for any category the model does not name. The growth multiplier is 1 + 0.6 × the seven-day TVL change, clamped to −60%…+120%; a protocol with no seven-day change scores 1. The maturity multiplier runs from 0.70 for a protocol listed yesterday to 1.00 for one listed four years ago, so age helps but never dominates; a protocol with no listing date scores as if it were a year old.</p>
+    <p class="formula">implied = tvl_usd × sector(category) × (1 + 0.6 × clamp(change_7d, −60, 120) / 100) × (0.70 + 0.30 × min(age_days, 1460) / 1460)</p>
+    <p class="model-text">The farm plan for a row is generated from the same numbers: the capital follows the protocol's TVL, the gas follows its main chain, and the hold period follows its age. The plan tells you what to do, what it costs and how long it takes — it does not tell you a token is coming. Nothing here is financial advice, and no row is a promise of an airdrop.</p>
+  </section>
+
+  <footer class="foot">
+    <p>Data: the sealed DefiLlama protocol snapshot. No live data, no network calls: this page works offline from the snapshot it ships with.</p>
+  </footer>
+</div>
+
+<dialog class="detail" id="detail" aria-labelledby="detail-title">
+  <div class="detail-head">
+    <div>
+      <span class="sub" id="detail-sub"></span>
+      <h2 id="detail-title"></h2>
+      <p class="sub" id="detail-meta"></p>
+    </div>
+    <button class="close" id="detail-close" type="button">Close</button>
+  </div>
+  <div id="detail-body"></div>
+</dialog>
+</body>
+</html>
